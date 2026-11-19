@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hosford Middle School • Question of the Day</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#061a22] text-slate-100 min-h-screen flex flex-col justify-between font-sans select-none">
+
+  <!-- Header -->
+  <header id="mainHeader" class="border-b border-[#1f7a99]/40 bg-[#092631]/95 backdrop-blur sticky top-0 z-20 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3.5">
+        <img src="logo.jpeg" alt="Hosford Husky Logo" class="w-12 h-12 rounded-xl object-cover border-2 border-[#7cc9e8] shadow-md bg-[#1a7a9a]" />
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-widest text-[#7cc9e8]">Hosford Middle School • Hallway Poll</span>
+          <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-white leading-tight">Question of the Day</h1>
+        </div>
+      </div>
+
+      <!-- Mode Switcher Tabs -->
+      <div class="flex items-center gap-2 bg-[#061a22] p-1.5 rounded-xl border border-[#1f7a99]/50">
+        <button id="btnControlTab" onclick="switchView('control')" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-[#1f7a99] text-white transition">
+          ⚙️ Control & Clicker
+        </button>
+        <button id="btnTvTab" onclick="switchView('tv')" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-300 hover:text-white transition">
+          📺 Hallway TV Display
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl w-full mx-auto px-4 py-6 flex-grow flex flex-col justify-center">
+
+    <!-- ================= VIEW 1: TEACHER CONTROL & CLICKER ================= -->
+    <section id="controlView" class="max-w-4xl w-full mx-auto space-y-6">
+
+      <!-- Giant Live Clicker Pad -->
+      <div class="bg-[#092631] border-2 border-[#7cc9e8]/50 rounded-2xl p-6 shadow-xl space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#1f7a99]/30 pb-3">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-[#7cc9e8]">Active Hallway Poll Clicker</span>
+            <h2 id="ctrlActiveQuestion" class="text-xl sm:text-2xl font-extrabold text-white mt-0.5">Loading question...</h2>
+          </div>
+          <span id="syncStatusBadge" class="text-xs font-semibold px-3 py-1 rounded-full bg-[#061a22] text-[#7cc9e8] border border-[#1f7a99]/50">
+            Ready
+          </span>
+        </div>
+
+        <!-- Two Big Clicker Buttons -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Choice A Clicker -->
+          <div class="bg-[#061a22] border-2 border-sky-400/60 rounded-2xl p-5 flex flex-col justify-between space-y-4">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <span class="text-xs font-black uppercase tracking-wider text-sky-400">Choice A (Key: 1 or ←)</span>
+                <div id="ctrlLabelA" class="text-xl font-extrabold text-white mt-1">Choice A</div>
+              </div>
+              <div id="ctrlCountA" class="text-4xl font-black text-sky-300">0</div>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="addVote('A', 1)" class="flex-grow py-5 rounded-xl bg-sky-600 hover:bg-sky-500 active:scale-95 text-white font-black text-xl shadow-lg transition">
+                +1 Vote A
+              </button>
+              <button onclick="addVote('A', -1)" title="Undo 1 vote" class="px-4 py-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm transition">
+                -1
+              </button>
+            </div>
+          </div>
+
+          <!-- Choice B Clicker -->
+          <div class="bg-[#061a22] border-2 border-amber-400/60 rounded-2xl p-5 flex flex-col justify-between space-y-4">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <span class="text-xs font-black uppercase tracking-wider text-amber-400">Choice B (Key: 2 or →)</span>
+                <div id="ctrlLabelB" class="text-xl font-extrabold text-white mt-1">Choice B</div>
+              </div>
+              <div id="ctrlCountB" class="text-4xl font-black text-amber-300">0</div>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="addVote('B', 1)" class="flex-grow py-5 rounded-xl bg-amber-600 hover:bg-amber-500 active:scale-95 text-white font-black text-xl shadow-lg transition">
+                +1 Vote B
+              </button>
+              <button onclick="addVote('B', -1)" title="Undo 1 vote" class="px-4 py-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm transition">
+                -1
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Daily Question & Choices Setup Form -->
+      <div class="bg-[#092631] border border-[#1f7a99]/50 rounded-2xl p-6 shadow-xl space-y-4">
+        <h3 class="text-lg font-extrabold text-white">Update Question & Choices for Today</h3>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-[#7cc9e8] mb-1">Question of the Day</label>
+          <input id="inputQuestion" type="text" placeholder="e.g., Would you rather have unlimited free tacos or unlimited free pizza?" class="w-full rounded-xl bg-[#061a22] border border-[#1f7a99]/60 px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-[#7cc9e8]" />
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-sky-400 mb-1">Choice A</label>
+            <input id="inputChoiceA" type="text" placeholder="e.g., Unlimited Tacos 🌮" class="w-full rounded-xl bg-[#061a22] border border-sky-400/50 px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-sky-400" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-amber-400 mb-1">Choice B</label>
+            <input id="inputChoiceB" type="text" placeholder="e.g., Unlimited Pizza 🍕" class="w-full rounded-xl bg-[#061a22] border border-amber-400/50 px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400" />
+          </div>
+        </div>
+        <button id="saveQuestionBtn" onclick="publishNewQuestion()" class="w-full py-3.5 rounded-xl bg-[#1f7a99] hover:bg-[#2793b8] font-bold text-white shadow-lg border border-[#7cc9e8]/30 transition">
+          Publish New Question & Reset Votes to 0 ✓
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 2: HALLWAY TV DISPLAY ================= -->
+    <section id="tvView" class="hidden w-full space-y-6">
+      <!-- Top TV Bar -->
+      <div class="flex items-center justify-between gap-4 bg-[#092631] border border-[#1f7a99]/50 rounded-2xl px-6 py-3.5">
+        <div class="flex items-center gap-3.5">
+          <img src="logo.jpeg" alt="Hosford Husky" class="w-12 h-12 rounded-xl border-2 border-[#7cc9e8]" />
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-widest text-[#7cc9e8]">Hosford Middle School • Question of the Day</span>
+            <div id="tvDateSubtitle" class="text-xs text-slate-400">Live Hallway Tally</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="bg-[#061a22] border border-[#7cc9e8]/40 rounded-xl px-4 py-1.5 text-center">
+            <span class="text-[10px] font-bold uppercase text-[#7cc9e8] block">Total Votes</span>
+            <span id="tvTotalVotes" class="text-xl font-black text-white">0</span>
+          </div>
+          <button id="fullscreenBtn" onclick="toggleTvFullscreen()" class="px-4 py-2.5 rounded-xl bg-[#1f7a99] hover:bg-[#2793b8] text-xs font-bold text-white transition">
+            ⛶ Fullscreen TV
+          </button>
+        </div>
+      </div>
+
+      <!-- Giant Question Banner -->
+      <div class="bg-[#092631] border-2 border-[#7cc9e8]/60 rounded-3xl p-8 sm:p-10 text-center shadow-2xl">
+        <h2 id="tvQuestionText" class="text-3xl sm:text-5xl font-black text-white leading-tight tracking-tight">
+          Loading Question of the Day...
+        </h2>
+      </div>
+
+      <!-- Giant Side-by-Side Vote Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Choice A TV Card -->
+        <div class="bg-[#092631] border-4 border-sky-400 rounded-3xl p-8 flex flex-col justify-between text-center space-y-6 shadow-2xl">
+          <div class="inline-block mx-auto px-4 py-1 rounded-full bg-sky-500/20 border border-sky-400/50 text-sky-300 text-sm font-black uppercase tracking-widest">
+            Choice A
+          </div>
+          <div id="tvChoiceAText" class="text-2xl sm:text-4xl font-extrabold text-white">Choice A</div>
+          <div>
+            <div id="tvVotesA" class="text-6xl sm:text-8xl font-black text-sky-300 tabular-nums">0</div>
+            <div id="tvPctA" class="text-lg sm:text-xl font-bold text-sky-400/80 mt-1">0%</div>
+          </div>
+        </div>
+
+        <!-- Choice B TV Card -->
+        <div class="bg-[#092631] border-4 border-amber-400 rounded-3xl p-8 flex flex-col justify-between text-center space-y-6 shadow-2xl">
+          <div class="inline-block mx-auto px-4 py-1 rounded-full bg-amber-500/20 border border-amber-400/50 text-amber-300 text-sm font-black uppercase tracking-widest">
+            Choice B
+          </div>
+          <div id="tvChoiceBText" class="text-2xl sm:text-4xl font-extrabold text-white">Choice B</div>
+          <div>
+            <div id="tvVotesB" class="text-6xl sm:text-8xl font-black text-amber-300 tabular-nums">0</div>
+            <div id="tvPctB" class="text-lg sm:text-xl font-bold text-amber-400/80 mt-1">0%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visual Tug-of-War Progress Bar -->
+      <div class="bg-[#092631] border border-[#1f7a99]/50 rounded-2xl p-4">
+        <div class="w-full h-7 rounded-xl overflow-hidden bg-[#061a22] flex">
+          <div id="barA" class="bg-sky-500 h-full transition-all duration-500" style="width: 50%"></div>
+          <div id="barB" class="bg-amber-500 h-full transition-all duration-500" style="width: 50%"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="mainFooter" class="text-center text-xs text-slate-400 py-4 border-t border-[#1f7a99]/30 bg-[#092631]/60">
+    Hosford Middle School • Question of the Day Live Board
+  </footer>
+
+  <script>
+    // =========================================================================
+    // 1. CONFIGURATION (PASTE YOUR GOOGLE APPS SCRIPT /exec URL HERE)
+    // =========================================================================
+    const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwXoc6GMmitsXqOwhCLVsLZuqGkfFk5cY_XmP2UZxV04vFVyvDnL9yATwv03tIZIjUu/exec
+';
+
+    // =========================================================================
+    // 2. STATE & SYNC ENGINE (JSONP - CORS-PROOF FOR PPS)
+    // =========================================================================
+    let pollState = {
+      question: 'Loading...',
+      choiceA: 'Choice A',
+      votesA: 0,
+      choiceB: 'Choice B',
+      votesB: 0,
+      date: ''
+    };
+
+    let pollTimer = null;
+    let saveTimeout = null;
+    let isFullscreen = false;
+    let ignoreIncomingUntil = 0; // Prevents stale poll overwrite right after clicking
+
+    window.handlePollCallback = function(data) {
+      if (Date.now() < ignoreIncomingUntil) return;
+      pollState = {
+        question: data.question || 'Question of the Day',
+        choiceA: data.choiceA || 'Choice A',
+        votesA: Number(data.votesA) || 0,
+        choiceB: data.choiceB || 'Choice B',
+        votesB: Number(data.votesB) || 0,
+        date: data.date || ''
+      };
+      renderAll();
+    };
+
+    function fetchPollData() {
+      if (SHEET_WEBHOOK_URL.includes('PASTE_YOUR')) return;
+      const old = document.getElementById('jsonp-poll-script');
+      if (old) old.remove();
+
+      const script = document.createElement('script');
+      script.id = 'jsonp-poll-script';
+      script.src = `${SHEET_WEBHOOK_URL}?callback=handlePollCallback&t=${Date.now()}`;
+      document.body.appendChild(script);
+    }
+
+    function renderAll() {
+      // Update Control View
+      document.getElementById('ctrlActiveQuestion').textContent = pollState.question;
+      document.getElementById('ctrlLabelA').textContent = pollState.choiceA;
+      document.getElementById('ctrlLabelB').textContent = pollState.choiceB;
+      document.getElementById('ctrlCountA').textContent = pollState.votesA;
+      document.getElementById('ctrlCountB').textContent = pollState.votesB;
+
+      // Update TV View
+      document.getElementById('tvQuestionText').textContent = pollState.question;
+      document.getElementById('tvChoiceAText').textContent = pollState.choiceA;
+      document.getElementById('tvChoiceBText').textContent = pollState.choiceB;
+      document.getElementById('tvVotesA').textContent = pollState.votesA;
+      document.getElementById('tvVotesB').textContent = pollState.votesB;
+
+      const total = pollState.votesA + pollState.votesB;
+      document.getElementById('tvTotalVotes').textContent = total;
+      const pctA = total > 0 ? Math.round((pollState.votesA / total) * 100) : 50;
+      const pctB = total > 0 ? 100 - pctA : 50;
+
+      document.getElementById('tvPctA').textContent = total > 0 ? `${pctA}%` : '0%';
+      document.getElementById('tvPctB').textContent = total > 0 ? `${pctB}%` : '0%';
+      document.getElementById('barA').style.width = `${pctA}%`;
+      document.getElementById('barB').style.width = `${pctB}%`;
+
+      if (pollState.date) {
+        document.getElementById('tvDateSubtitle').textContent = `Live Hallway Tally • ${pollState.date}`;
+      }
+    }
+
+    // =========================================================================
+    // 3. CLICKER VOTING & NEW QUESTION PUBLISHING
+    // =========================================================================
+    function addVote(choice, delta) {
+      if (choice === 'A') {
+        pollState.votesA = Math.max(0, pollState.votesA + delta);
+      } else {
+        pollState.votesB = Math.max(0, pollState.votesB + delta);
+      }
+      ignoreIncomingUntil = Date.now() + 4000;
+      renderAll();
+
+      const badge = document.getElementById('syncStatusBadge');
+      badge.textContent = 'Saving vote...';
+
+      clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(() => {
+        postToSheet({
+          action: 'vote',
+          votesA: pollState.votesA,
+          votesB: pollState.votesB
+        });
+      }, 250);
+    }
+
+    async function publishNewQuestion() {
+      const q = document.getElementById('inputQuestion').value.trim();
+      const a = document.getElementById('inputChoiceA').value.trim();
+      const b = document.getElementById('inputChoiceB').value.trim();
+
+      if (!q || !a || !b) {
+        return alert('Please enter the Question of the Day, Choice A, and Choice B.');
+      }
+
+      pollState.question = q;
+      pollState.choiceA = a;
+      pollState.choiceB = b;
+      pollState.votesA = 0;
+      pollState.votesB = 0;
+      ignoreIncomingUntil = Date.now() + 5000;
+      renderAll();
+
+      const btn = document.getElementById('saveQuestionBtn');
+      btn.disabled = true;
+      btn.textContent = 'Publishing to Hallway TV...';
+
+      await postToSheet({
+        action: 'new',
+        question: q,
+        choiceA: a,
+        votesA: 0,
+        choiceB: b,
+        votesB: 0
+      });
+
+      btn.disabled = false;
+      btn.textContent = 'Publish New Question & Reset Votes to 0 ✓';
+    }
+
+    async function postToSheet(payload) {
+      if (SHEET_WEBHOOK_URL.includes('PASTE_YOUR')) return;
+      try {
+        await fetch(SHEET_WEBHOOK_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        document.getElementById('syncStatusBadge').textContent = 'Synced ✓';
+      } catch (err) {
+        console.error('Sync error:', err);
+        document.getElementById('syncStatusBadge').textContent = 'Sync error';
+      }
+    }
+
+    // =========================================================================
+    // 4. KEYBOARD / PRESENTATION CLICKER SHORTCUTS & VIEW SWITCHING
+    // =========================================================================
+    document.addEventListener('keydown', (e) => {
+      // Ignore keypresses while typing in text inputs
+      if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+
+      if (e.key === '1' || e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') {
+        addVote('A', 1);
+      } else if (e.key === '2' || e.key === 'b' || e.key === 'B' || e.key === 'ArrowRight') {
+        addVote('B', 1);
+      }
+    });
+
+    function switchView(view) {
+      const isControl = view === 'control';
+      document.getElementById('controlView').classList.toggle('hidden', !isControl);
+      document.getElementById('tvView').classList.toggle('hidden', isControl);
+
+      document.getElementById('btnControlTab').className = isControl
+        ? 'px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-[#1f7a99] text-white transition'
+        : 'px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-300 hover:text-white transition';
+      document.getElementById('btnTvTab').className = !isControl
+        ? 'px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-[#1f7a99] text-white transition'
+        : 'px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-300 hover:text-white transition';
+    }
+
+    function toggleTvFullscreen() {
+      isFullscreen = !isFullscreen;
+      document.getElementById('mainHeader').classList.toggle('hidden', isFullscreen);
+      document.getElementById('mainFooter').classList.toggle('hidden', isFullscreen);
+      document.getElementById('fullscreenBtn').textContent = isFullscreen ? '✕ Exit Fullscreen' : '⛶ Fullscreen TV';
+    }
+
+    // Initialize & Poll every 3 seconds for fast hallway TV updates
+    fetchPollData();
+    pollTimer = setInterval(fetchPollData, 3000);
+  </script>
+</body>
+</html>
